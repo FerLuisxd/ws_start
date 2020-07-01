@@ -1,19 +1,54 @@
 <!DOCTYPE html>
 
 <body>
+    <link rel="stylesheet" href="https://stackpath.bootstrapcdn.com/bootstrap/4.5.0/css/bootstrap.min.css"
+        integrity="sha384-9aIt2nRpC12Uk9gS9baDl411NQApFmC26EwAOH8WgZl5MYYxFfc+NcPb1dKGj7Sk" crossorigin="anonymous">
+    <script src="https://code.jquery.com/jquery-3.5.1.slim.min.js"
+        integrity="sha384-DfXdz2htPH0lsSSs5nCTpuj/zy4C+OGpamoFVy38MVBnE+IbbVYUew+OrCXaRkfj"
+        crossorigin="anonymous"></script>
+    <script src="https://cdn.jsdelivr.net/npm/popper.js@1.16.0/dist/umd/popper.min.js"
+        integrity="sha384-Q6E9RHvbIyZFJoft+2mJbHaEWldlvI9IOYy5n3zV9zzTtmI3UksdQRVvoxMfooAo"
+        crossorigin="anonymous"></script>
+    <script src="https://stackpath.bootstrapcdn.com/bootstrap/4.5.0/js/bootstrap.min.js"
+        integrity="sha384-OgVRvuATP1z7JjHLkuOU7Xw704+h835Lr+6QL9UvYjZE3Ipu6Tp75j7Bh/kR0JKI"
+        crossorigin="anonymous"></script>
     <div class="main">
-        <ul id="chat"></ul>
-        <input id="input" ></input>
+        <div id="overlay">
+            <div id="text">
+                <p>Ingresa nombre</p>
+                <input id="nameInput"></input>
+                <button onclick="off()">Send</button>
+            </div>
+
+        </div>
         <p></p>
-        <button id="btn">Send</button>
+        <ul id="chat"></ul>
+        <input id="input"></input>
+        <button id="btn" type="button" class="btn btn-primary" onclick="sendMessage()">Send</button>
     </div>
     <script>
         let ws = new WebSocket('ws://192.168.1.2:9001/');
-        let user = Math.random()
+        //let user = Math.random()
         ws.onopen = function (event) {
-            // ws.send('hello');
-           
         };
+
+        function on() {
+            document.getElementById("overlay").style.display = "block";
+        }
+        let user = ''
+        function off() {
+            user = document.getElementById("nameInput").value
+            console.log('nombre', user)
+            if (user != "") {
+                ws.send(JSON.stringify({
+                    // message: user,
+                    method: 'new',
+                    user: user
+                }));
+                document.getElementById("overlay").style.display = "none";
+            }
+        }
+
 
         ws.onmessage = function (msg) {
             // console.log('msg', msg)
@@ -22,27 +57,52 @@
             let el = document.createElement('li')
             let msgParsed = JSON.parse(msg.data)
             console.log(msgParsed.message)
-            el.innerHTML = msgParsed.user + ' ' + msgParsed.message
+            el.innerHTML = msgParsed.user + ': ' + msgParsed.message
             list.appendChild(el)
         }
-        
+
         let btn = document.getElementById('btn')
         let inputText = document.getElementById('input')
-        btn.addEventListener('click', (ev)=>{
+        function sendMessage() {
             console.log('clicked')
             console.log(ws.OPEN)
             ws.send(JSON.stringify({
-                message:inputText.value, 
-                method:'chat',
-                user:user
+                message: inputText.value,
+                method: 'chat',
+                user: user
             }));
-        })
+        }
+        // btn.addEventListener('click', (ev) => sendMessage())
 
     </script>
 </body>
 <style>
-.main{
-    padding: 15%;
-}
+    .main {
+        padding: 1%;
+    }
+
+    #overlay {
+        position: fixed;
+        display: block;
+        width: 100%;
+        height: 100%;
+        top: 0;
+        left: 0;
+        right: 0;
+        bottom: 0;
+        background-color: rgba(0, 0, 0, 0.5);
+        z-index: 2;
+        cursor: pointer;
+    }
+
+    #text {
+        position: absolute;
+        top: 50%;
+        left: 50%;
+        font-size: 50px;
+        color: black;
+        transform: translate(-50%, -50%);
+        -ms-transform: translate(-50%, -50%);
+    }
 </style>
 <!DOCTYPE html>
