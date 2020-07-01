@@ -1,0 +1,48 @@
+<!DOCTYPE html>
+
+<body>
+    <div class="main">
+        <ul id="chat"></ul>
+        <input id="input" ></input>
+        <p></p>
+        <button id="btn">Send</button>
+    </div>
+    <script>
+        let ws = new WebSocket('ws://192.168.1.2:9001/');
+        let user = Math.random()
+        ws.onopen = function (event) {
+            // ws.send('hello');
+           
+        };
+
+        ws.onmessage = function (msg) {
+            // console.log('msg', msg)
+            // console.log('msg', msg.data)
+            let list = document.getElementById('chat')
+            let el = document.createElement('li')
+            let msgParsed = JSON.parse(msg.data)
+            console.log(msgParsed.message)
+            el.innerHTML = msgParsed.user + ' ' + msgParsed.message
+            list.appendChild(el)
+        }
+        
+        let btn = document.getElementById('btn')
+        let inputText = document.getElementById('input')
+        btn.addEventListener('click', (ev)=>{
+            console.log('clicked')
+            console.log(ws.OPEN)
+            ws.send(JSON.stringify({
+                message:inputText.value, 
+                method:'chat',
+                user:user
+            }));
+        })
+
+    </script>
+</body>
+<style>
+.main{
+    padding: 15%;
+}
+</style>
+<!DOCTYPE html>
