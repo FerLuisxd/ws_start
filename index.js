@@ -1,5 +1,5 @@
 const uWS = require('uWebSockets.js');
-const port = 9001;
+const port = 3000;
 let socketList = {}
 const app = uWS./*SSL*/App({
   // key_file_name: 'misc/key.pem',
